@@ -8,10 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
+typedef void(^buttonDidClick)();
+
 @interface KDButtonView : UIView
 
 @property (nonatomic, strong) NSArray *buttonTitles;
-@property (nonatomic, assign) CGSize buttonSize;
-
+@property (nonatomic, assign) CGFloat buttonHeight;
+@property (nonatomic, copy) buttonDidClick didClick;
 
 @end
