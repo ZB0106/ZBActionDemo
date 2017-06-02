@@ -14,7 +14,7 @@
 
 @interface KDButtonView ()
 
-@property (nonatomic, strong) NSMutableArray *buttonArray;
+
 @property (nonatomic, strong) NSMutableArray *lineArray;
 
 @end
@@ -29,18 +29,18 @@
     return self;
 }
 
-- (void)setButtonTitles:(NSArray *)buttonTitles
+- (void)setButtonArray:(NSMutableArray *)buttonArray
 {
-    _buttonTitles = buttonTitles;
-    NSInteger buttonCount = buttonTitles.count;
+    _buttonArray = buttonArray;
+    
+    NSInteger buttonCount = buttonArray.count;
+    
     self.height = buttonCount * self.buttonHeight;
+    
     for (int i = 0; i < buttonCount; i ++) {
-        NSString *title = buttonTitles[i];
-        KDActionButton *btn = [[KDActionButton alloc] init];
-        [btn setTitle:title forState:UIControlStateNormal
-         ];
-        [btn addTarget:self action:@selector(actionButtonDidClick:) forControlEvents:UIControlEventTouchUpInside];
-        [self.buttonArray addObject:btn];
+        KDActionButton *btn = buttonArray[i];
+        [btn addTarget:self action:@selector(didClickForAction:) forControlEvents:UIControlEventTouchUpInside];
+        [self addSubview:btn];
         
         if (i != buttonCount - 1) {
             UIView *lineView = [[UIView alloc] init];
@@ -52,8 +52,8 @@
 
 - (void)didClickForAction:(KDActionButton *)button
 {
-    if (self.didClick) {
-        self.didClick();
+    if (self.buttonViewDelegate && [self.buttonViewDelegate respondsToSelector:@selector(buttonDidClick)]) {
+        [self.buttonViewDelegate buttonDidClick];
     }
     __weak typeof(button) weakBtn = button;
     if (button.action) {
@@ -90,19 +90,12 @@
 - (void)setButtonHeight:(CGFloat)buttonHeight
 {
     _buttonHeight = buttonHeight;
+    self.height = self.buttonArray.count * buttonHeight;
     [self layoutIfNeeded];
 }
 
 
 #pragma mark 懒加载
-- (NSMutableArray *)buttonArray
-{
-    if (_buttonArray == nil) {
-        _buttonArray = [NSMutableArray array];
-    }
-    return _buttonArray;
-}
-
 - (NSMutableArray *)lineArray
 {
     if (_lineArray == nil) {
@@ -110,9 +103,4 @@
     }
     return _lineArray;
 }
-- (void)actionButtonDidClick:(UIButton *)button
-{
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"KDActionButtonDidClick" object:nil userInfo:@{@"button":button}];
-}
-
 @end

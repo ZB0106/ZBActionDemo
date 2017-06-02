@@ -17,12 +17,13 @@
     
 }
 
-+ (instancetype)kdActionButtonWithButtonType:(ZB_buttonType)buttonType action:(buttonAction)action
++ (instancetype)kdActionButtonWithButtonType:(ZB_buttonType)buttonType title:(NSString *)title action:(buttonAction)action
 {
     ZB_ButtonItem *item = [ZB_ButtonItem zb_buttonItemWithButtonType:buttonType];
     KDActionButton *btn = [KDActionButton buttonWithType:UIButtonTypeCustom];
     [btn setTitleColor:item.titleColor forState:UIControlStateNormal];
     btn.titleLabel.font = item.titleFont;
+    [btn setTitle:title forState:UIControlStateNormal];
     btn.adjustsImageWhenHighlighted = NO;
     [btn setExclusiveTouch:YES];/*禁用按钮同时点击*/
     btn.backgroundColor = ClearColor;

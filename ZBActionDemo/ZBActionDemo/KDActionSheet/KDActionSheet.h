@@ -12,7 +12,6 @@
 
 @protocol KDActionSheetDelegate <NSObject>
 
-- (void)kdActionSheet:(KDActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex;
 
 @end
 
@@ -28,11 +27,9 @@
 @property (nonatomic, assign) NSTextAlignment messageLabelAlignment;
 
 
-@property (nonatomic, strong) UIImageView *bigImageView;
-@property (nonatomic, weak) id<KDActionSheetDelegate> delegate;
-
-
-- (instancetype)initWithTitle:(NSString *)title message:(NSString *)message cancelButtonTitle:(NSString *)cancelButtonTitle buttonTitles:(NSArray *)otherButtonTitles delegate:(id<KDActionSheetDelegate>)delegate;
+- (instancetype)initWithTitle:(NSString *)title message:(NSString *)message;
 - (void)show;
 - (void)showInView:(UIView *)view;
+- (void)addActionButtonArray:(NSArray *)actionButtonArray;
+- (void)addActionButton:(id)actionButton;
 @end

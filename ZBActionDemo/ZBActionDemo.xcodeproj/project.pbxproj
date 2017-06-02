@@ -43,6 +43,8 @@
 		21531A361EE1331C00F60258 /* UIView+zb_ViewCategory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+zb_ViewCategory.h"; sourceTree = "<group>"; };
 		21531A371EE1331C00F60258 /* UIView+zb_ViewCategory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+zb_ViewCategory.m"; sourceTree = "<group>"; };
 		21531A3C1EE1646900F60258 /* FontMacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontMacro.h; sourceTree = "<group>"; };
+		B3A23ECC1EE1C3B10076206A /* ZBActionProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZBActionProtocol.h; sourceTree = "<group>"; };
+		B3A23ECE1EE1C7AC0076206A /* ZB_ActionSheet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZB_ActionSheet.h; sourceTree = "<group>"; };
 		B3CF03F51EE05AB400ECE133 /* ZBActionDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZBActionDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B3CF03F91EE05AB400ECE133 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		B3CF03FB1EE05AB400ECE133 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -168,6 +170,8 @@
 				B3CF04311EE05AC500ECE133 /* KDButtonView.m */,
 				21531A361EE1331C00F60258 /* UIView+zb_ViewCategory.h */,
 				21531A371EE1331C00F60258 /* UIView+zb_ViewCategory.m */,
+				B3A23ECC1EE1C3B10076206A /* ZBActionProtocol.h */,
+				B3A23ECE1EE1C7AC0076206A /* ZB_ActionSheet.h */,
 			);
 			path = KDActionSheet;
 			sourceTree = "<group>";

@@ -7,13 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "ZBActionProtocol.h"
 
-typedef void(^buttonDidClick)();
+@interface KDButtonView : UIView<ZBActionProtocol>
 
-@interface KDButtonView : UIView
-
-@property (nonatomic, strong) NSArray *buttonTitles;
+@property (nonatomic, strong) NSMutableArray *buttonArray;
 @property (nonatomic, assign) CGFloat buttonHeight;
-@property (nonatomic, copy) buttonDidClick didClick;
+@property (nonatomic, weak) id<ZBActionProtocol> buttonViewDelegate;
 
 @end

@@ -8,112 +8,105 @@
 
 #import "KDActionSheet.h"
 #import "KDButtonView.h"
+#import "ColorMacro.h"
+#import "FontMacro.h"
+#import "UIView+zb_ViewCategory.h"
 
 
 #define HEIGHT 44
 #define GAP 10
 
-@interface KDActionSheet ()
+@interface KDActionSheet ()<ZBActionProtocol>
 
-@property (nonatomic, strong) NSMutableArray *buttonTitles;
-//@property (nonatomic, strong) NSMutableArray *labelTitles;
+
 @property (nonatomic, strong) UIImageView *contentView;
-//@property (nonatomic, copy) NSString *title;
-@property (nonatomic, copy) NSString *message;
-@property (nonatomic, weak) UIView *lineView;
-
 @property (nonatomic, weak) UILabel *titleLable;
 @property (nonatomic, weak) UIButton *coverBtn;
 @property (nonatomic, strong) KDButtonView *buttonView;
 @property (nonatomic, weak) UILabel *messageLabel;
 @property (nonatomic, strong) UIView *labelView;
 
+@property (nonatomic, strong) NSMutableArray *lineArray;
+@property (nonatomic, strong) NSMutableArray *buttonArray;
+
 @end
 
 @implementation KDActionSheet
 
-- (instancetype)initWithTitle:(NSString *)title message:(NSString *)message cancelButtonTitle:(NSString *)cancelButtonTitle buttonTitles:(NSArray *)otherButtonTitles delegate:(id<KDActionSheetDelegate>)delegate
+- (instancetype)initWithTitle:(NSString *)title message:(NSString *)message
 {
     self = [super init];
     if (self) {
-        self.backgroundColor = ClearColor;
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(buttonDidClick:) name:@"KDActionButtonDidClick" object:nil];
-        
-        self.delegate = delegate;
+        self.backgroundColor = RedColor;
         
         UIButton *coverBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         coverBtn.userInteractionEnabled = NO;
         [coverBtn addTarget:self action:@selector(dismissKdActionSheet) forControlEvents:UIControlEventTouchUpInside];
-        coverBtn.backgroundColor = [UIColor blackColor];
+        coverBtn.backgroundColor = BlackColor;
         coverBtn.alpha = 0.5;
         self.coverBtn = coverBtn;
         [self addSubview:coverBtn];
         
+        
+        [self addSubview:self.contentView];
+        [self.contentView addSubview:self.labelView];
+        [self.contentView addSubview:self.buttonView];
+        
         if (title != nil) {
-
-            UILabel *label = [[UILabel alloc] init];
-            label.font = [UIFont boldSystemFontOfSize:18.0];
-            label.textAlignment = NSTextAlignmentCenter;
-            label.text = title;
-            label.backgroundColor = [UIColor clearColor];
-            self.titleLable = label;
-            [self.labelView addSubview:label];
-
+            self.titleLable = [self labelWithTitle:title font:BoldSystemFontOfSize(18.0)];
+            [self.labelView addSubview:self.titleLable];
         }
         
         if (message != nil) {
-            UILabel *label = [[UILabel alloc] init];
-            label.font = [UIFont systemFontOfSize:15.0];
-            label.numberOfLines = 0;
-            label.textAlignment = NSTextAlignmentCenter;
-            label.text = message;
-            label.backgroundColor = [UIColor clearColor];
-
-            self.messageLabel = label;
-            [self.labelView addSubview:label];
+        
+            self.messageLabel = [self labelWithTitle:message font:SystemFontOfSize(16.0f)];
+            [self.labelView addSubview:self.messageLabel];
         
         }
-        if (message != nil || title != nil) {
+        NSInteger count = self.labelView.subviews.count;
+        for (int i = 0; i < count; i ++) {
             UIView *lineView = [[UIView alloc] init];
             lineView.backgroundColor = [UIColor colorWithRed:128 / 255.0 green:128 / 255.0 blue:128 / 255.0 alpha:1.0];
-            self.lineView = lineView;
             [self.labelView addSubview:lineView];
-        }
-        if (cancelButtonTitle != nil) {
-            
-            [self.buttonTitles addObject:cancelButtonTitle];
-        }
-        if (otherButtonTitles.count > 0) {
-            
-            for (int i = 0; i < otherButtonTitles.count; i ++) {
-                NSString *title = otherButtonTitles[i];
-                [self.buttonTitles insertObject:title atIndex:i];
-            }
-        }
-        if (self.buttonTitles.count > 0) {
-            self.buttonView.buttonTitles = self.buttonTitles;
+            [self.lineArray addObject:lineView];
         }
     }
     return self;
 }
 
-
-
-#pragma mark 懒加载
-- (NSMutableArray *)buttonTitles
+- (UILabel *)labelWithTitle:(NSString *)title font:(UIFont *)font
 {
-    if (_buttonTitles == nil) {
-        _buttonTitles = [NSMutableArray array];
-    }
-    return _buttonTitles;
+    UILabel *label = [[UILabel alloc] init];
+    label.font = font;
+    label.numberOfLines = 0;
+    label.textAlignment = NSTextAlignmentCenter;
+    label.text = title;
+    label.backgroundColor = ClearColor;
+    return label;
 }
 
+#pragma mark 懒加载
+
+- (NSMutableArray *)lineArray
+{
+    if (_lineArray == nil) {
+        _lineArray = @[].mutableCopy;
+    }
+    return _lineArray;
+}
+
+- (NSMutableArray *)buttonArray
+{
+    if (!_buttonArray) {
+        _buttonArray = @[].mutableCopy;
+    }
+    return _buttonArray;
+}
 - (KDButtonView *)buttonView
 {
     if (_buttonView == nil) {
         _buttonView = [[KDButtonView alloc] init];
-        _buttonView.backgroundColor = [UIColor clearColor];
-        [self.contentView addSubview:_buttonView];
+        _buttonView.backgroundColor = ClearColor;
     }
     return _buttonView;
 }
@@ -122,8 +115,7 @@
 {
     if (_labelView == nil) {
         _labelView = [[UIView alloc] init];
-        _labelView.backgroundColor = [UIColor clearColor];
-        [self.contentView addSubview:_labelView];
+        _labelView.backgroundColor = ClearColor;
     }
     return _labelView;
 }
@@ -135,19 +127,9 @@
         _contentView.userInteractionEnabled = YES;
         _contentView.layer.cornerRadius = 3.0f;
         _contentView.layer.masksToBounds = YES;
-        _contentView.backgroundColor = ClearColor;
-        [self addSubview:_contentView];
+        _contentView.backgroundColor = WhiteColor;
     }
     return _contentView;
-}
-
-- (UIImageView *)bigImageView
-{
-    if (_bigImageView == nil) {
-        _bigImageView = [[UIImageView alloc] init];
-        [self addSubview:_bigImageView];
-    }
-    return _bigImageView;
 }
 
 #pragma mark 设置各控件的属性
@@ -213,7 +195,15 @@
 }
 
 
+- (void)addActionButtonArray:(NSArray *)actionButtonArray
+{
+    [self.buttonArray addObjectsFromArray:actionButtonArray];
+}
 
+- (void)addActionButton:(id)actionButton
+{
+    [self.buttonArray addObject:actionButton];
+}
 
 
 - (void)showInView:(UIView *)view
@@ -223,19 +213,10 @@
     self.frame = keyWindow.bounds;
     self.coverBtn.frame = self.bounds;
     
-    
-    if (self.bigImageView) {
-        self.bigImageView.frame = CGRectMake((HARDWARE_SCREEN_WIDTH - OppositeWidthRate(200)) / 2.0f, OppositeHeightRate(50) + 64, OppositeWidthRate(200), OppositeWidthRate(200));
-        self.bigImageView.layer.cornerRadius = self.bigImageView.width / 2.0f;
-        self.bigImageView.layer.masksToBounds = YES;
-    }
-    
     CGFloat contentX = GAP;
-    CGFloat contentY = self.frame.size.height;
-    CGFloat contentW = self.frame.size.width - GAP * 2;
+    CGFloat contentY = self.height;
+    CGFloat contentW = self.width - GAP * 2;
     CGFloat contentH = 0;
-    
-    
     
     CGFloat labelX = 0;
     CGFloat labelY = 0;
@@ -247,47 +228,30 @@
     }
     
     if (self.messageLabel != nil) {
-        CGSize messageSize = [self sizeWithFont:self.messageLabel.font text:self.messageLabel.text];
+        CGSize messageSize = [self sizeWithFont:self.messageLabel.font text:self.messageLabel.text maxSize:CGSizeMake(contentW - 6 * GAP, MAXFLOAT)];
         self.messageLabel.frame = CGRectMake(3 * GAP, CGRectGetMaxY(self.titleLable.frame), contentW - 6 * GAP, messageSize.height + GAP);
-        labelH = labelH + self.messageLabel.frame.size.height + GAP;
+        labelH = labelH + self.messageLabel.height + GAP;
     }
     
-    if (self.lineView != nil) {
-        self.lineView.frame = CGRectMake(0, HEIGHT, contentW, 0.5);
-    }
 
     self.labelView.frame = CGRectMake(labelX, labelY, labelW, labelH);
-    if (self.buttonTitles.count > 0) {
-        
-        if (self.buttonTitles.count == 2) {
-            self.buttonView.frame = CGRectMake(0, CGRectGetMaxY(self.labelView.frame), contentW, HEIGHT);
-            self.buttonView.buttonSize = self.buttonView.frame.size;
-        } else {
-            self.buttonView.frame = CGRectMake(0, CGRectGetMaxY(self.labelView.frame), contentW, HEIGHT * self.buttonTitles.count + OppositeHeightRate(16));
-            self.buttonView.buttonSize = self.buttonView.frame.size;
-        }
-        
-    }
-    contentH = self.labelView.frame.size.height + self.buttonView.frame.size.height;
     
-    self.contentView.frame = CGRectMake(contentX, contentY, contentW, contentH);
+    self.buttonView.buttonArray = self.buttonArray;
+    self.buttonView.buttonHeight = HEIGHT;
     
-    if (HARDWARE_SCREEN_HEIGHT > 480.0f) {
-        [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
-            CGRect rect = self.contentView.frame;
-            rect.origin.y = self.frame.size.height - contentH - OppositeHeightRate(40);
-            self.contentView.frame = rect;
-        } completion:nil];
-    } else {
-        [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
-            CGRect rect = self.contentView.frame;
-            rect.origin.y = self.frame.size.height - contentH - GAP;
-            self.contentView.frame = rect;
-        } completion:nil];
+    contentH = self.labelView.height + self.buttonView.height;
+    
+    self.contentView.top = contentY;
+    self.contentView.left = contentX;
+    self.contentView.height = contentH;
+    self.contentView.width = contentW;
+    
+    [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
+        
+        self.contentView.top = self.height - contentH - 2 * GAP;
+        
+    } completion:nil];
 
-    }
-   CALayer
-    
 }
 
 
@@ -301,7 +265,7 @@
     
     CGFloat contentCenterX = 0;
     CGFloat contentCenterY = 0;
-    CGFloat contentW = self.frame.size.width - GAP * 2;
+    CGFloat contentW = self.width - GAP * 2;
     CGFloat contentH = 0;
     
     
@@ -316,62 +280,51 @@
     }
     
     if (self.messageLabel != nil) {
-        CGSize messageSize = [self sizeWithFont:self.messageLabel.font text:self.messageLabel.text];
+        CGSize messageSize = [self sizeWithFont:self.messageLabel.font text:self.messageLabel.text maxSize:CGSizeMake(contentW - 6 * GAP, MAXFLOAT)];
         self.messageLabel.frame = CGRectMake(3 * GAP, CGRectGetMaxY(self.titleLable.frame), contentW - 6 * GAP, messageSize.height + GAP);
-        labelH = labelH + self.messageLabel.frame.size.height + GAP;
+        labelH = labelH + self.messageLabel.height + GAP;
     }
     
-        if (self.lineView != nil) {
-            self.lineView.frame = CGRectMake(0, HEIGHT, contentW, 0.5);
-        }
-    
-    self.labelView.frame = CGRectMake(labelX, labelY, labelW, labelH);
-    if (self.buttonTitles.count > 0) {
-        
-        if (self.buttonTitles.count == 2) {
-            self.buttonView.frame = CGRectMake(0, CGRectGetMaxY(self.labelView.frame), contentW, HEIGHT);
-            self.buttonView.buttonSize = self.buttonView.frame.size;
+    for (int i = 0; i < self.lineArray.count; i ++) {
+        UIView *line = self.lineArray[i];
+        if (i == 1 || self.lineArray.count == 1) {
+            line.frame = CGRectMake(0, labelH, contentW, 0.5f);
         } else {
-            self.buttonView.frame = CGRectMake(0, CGRectGetMaxY(self.labelView.frame), contentW, HEIGHT * self.buttonTitles.count);
-            self.buttonView.buttonSize = self.buttonView.frame.size;
+            line.frame = CGRectMake(0, HEIGHT, contentW, 0.5f);
         }
         
     }
-    contentH = self.labelView.frame.size.height + self.buttonView.frame.size.height;
-    contentCenterX = self.center.x;
-    contentCenterY = self.center.y;
+    self.labelView.frame = CGRectMake(labelX, labelY, labelW, labelH);
     
-    self.contentView.frame = CGRectMake(0, 0, contentW, contentH);
+    self.buttonView.buttonArray = self.buttonArray;
+    self.buttonView.buttonHeight = HEIGHT;
     
-    self.contentView.center = CGPointMake(contentCenterX, contentCenterY);
+    contentH = self.labelView.height + self.buttonView.height;
+    contentCenterX = self.centerX;
+    contentCenterY = self.centerY;
     
+    self.contentView.centerX = contentCenterX;
+    self.contentView.centerY = contentCenterY;
+    
+    [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
+        
+        self.contentView.size = CGSizeMake(contentW, contentH);
+        
+    } completion:nil];
 }
-
-- (void)buttonDidClick:(NSNotification *)notice
+- (void)buttonDidClick
 {
-    UIButton *button = notice.userInfo[@"button"];
-    if ([self.delegate respondsToSelector:@selector(kdActionSheet:clickedButtonAtIndex:)]) {
-        [self.delegate kdActionSheet:self clickedButtonAtIndex:button.tag];
-    }
-    
     [self dismissKdActionSheet];
 }
-
 
 - (void)dismissKdActionSheet
 {
     [self removeFromSuperview];
 }
 
-- (CGSize)sizeWithFont:(UIFont *)font text:(NSString *)text
+- (CGSize)sizeWithFont:(UIFont *)font text:(NSString *)text maxSize:(CGSize)size
 {
-    UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
-    CGFloat maxW = keyWindow.frame.size.width - 8 * GAP;
-    return [text boundingRectWithSize:CGSizeMake(maxW, MAXFLOAT) options:NSStringDrawingTruncatesLastVisibleLine | NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: font} context:nil].size;
+    return [text boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName: font} context:nil].size;
 }
 
-- (void)dealloc
-{
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
 @end
