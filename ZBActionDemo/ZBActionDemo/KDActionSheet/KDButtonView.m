@@ -35,8 +35,6 @@
     
     NSInteger buttonCount = buttonArray.count;
     
-    self.height = buttonCount * self.buttonHeight;
-    
     for (int i = 0; i < buttonCount; i ++) {
         KDActionButton *btn = buttonArray[i];
         [btn addTarget:self action:@selector(didClickForAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -44,7 +42,8 @@
         
         if (i != buttonCount - 1) {
             UIView *lineView = [[UIView alloc] init];
-            lineView.backgroundColor = RGBCOLORWITH16COLOR(0xaaaaaa);
+            lineView.backgroundColor = RGBACOLORWithAlpha(128, 128, 128, 0.5);
+            [self addSubview:lineView];
             [self.lineArray addObject:lineView];
         }
     }
@@ -66,22 +65,22 @@
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    CGFloat width = self.width;
-    
     NSInteger buttonCount = self.buttonArray.count;
     BOOL isCountEqaulTwo = buttonCount == 2;
+    CGFloat width = isCountEqaulTwo ? self.width / 2.0 : self.width;
+    
     for (int i = 0; i < buttonCount; i ++) {
         UIButton *btn = self.buttonArray[i];
-        btn.top = isCountEqaulTwo ? 0 : i * self.height;
+        btn.top = isCountEqaulTwo ? 0 : i * self.buttonHeight;
         btn.left = isCountEqaulTwo ? i * width : 0;
-        btn.width = isCountEqaulTwo ? width / 2.0 : width;
+        btn.width = width;
         btn.height = self.buttonHeight;
         if (i != buttonCount - 1) {
             UIView *line = self.lineArray[i];
-            line.top = isCountEqaulTwo ? 0 : (i + 1) * self.height;
-            line.left = isCountEqaulTwo ? i * width : 0;
+            line.top = isCountEqaulTwo ? 0 : (i + 1) * self.buttonHeight;
+            line.left = isCountEqaulTwo ? (i + 1) * width : 0;
             line.width = isCountEqaulTwo ? 0.5 : width;
-            line.height = isCountEqaulTwo ? self.height : 0.5;
+            line.height = isCountEqaulTwo ? self.buttonHeight : 0.5;
         }
         
     }
@@ -92,6 +91,7 @@
     _buttonHeight = buttonHeight;
     self.height = self.buttonArray.count * buttonHeight;
     [self layoutIfNeeded];
+    [self setNeedsLayout];
 }
 
 

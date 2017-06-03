@@ -15,35 +15,38 @@
 
 #define HEIGHT 44
 #define GAP 10
+#define ZB_animationDuration 0.3
 
-@interface KDActionSheet ()<ZBActionProtocol>
+@interface KDActionSheet ()<ZBActionProtocol, CAAnimationDelegate>
 
 
 @property (nonatomic, strong) UIImageView *contentView;
-@property (nonatomic, weak) UILabel *titleLable;
+@property (nonatomic, strong) UILabel *titleLable;
 @property (nonatomic, weak) UIButton *coverBtn;
 @property (nonatomic, strong) KDButtonView *buttonView;
-@property (nonatomic, weak) UILabel *messageLabel;
+@property (nonatomic, strong) UILabel *messageLabel;
 @property (nonatomic, strong) UIView *labelView;
 
 @property (nonatomic, strong) NSMutableArray *lineArray;
 @property (nonatomic, strong) NSMutableArray *buttonArray;
 
+
 @end
 
 @implementation KDActionSheet
+
+UIWindow *_showWindow;
 
 - (instancetype)initWithTitle:(NSString *)title message:(NSString *)message
 {
     self = [super init];
     if (self) {
-        self.backgroundColor = RedColor;
+        self.backgroundColor = ClearColor;
         
         UIButton *coverBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        coverBtn.userInteractionEnabled = NO;
+        coverBtn.userInteractionEnabled = YES;
         [coverBtn addTarget:self action:@selector(dismissKdActionSheet) forControlEvents:UIControlEventTouchUpInside];
-        coverBtn.backgroundColor = BlackColor;
-        coverBtn.alpha = 0.5;
+        coverBtn.backgroundColor = RGBACOLORWithAlpha(0, 0, 0, 0.2);
         self.coverBtn = coverBtn;
         [self addSubview:coverBtn];
         
@@ -66,7 +69,7 @@
         NSInteger count = self.labelView.subviews.count;
         for (int i = 0; i < count; i ++) {
             UIView *lineView = [[UIView alloc] init];
-            lineView.backgroundColor = [UIColor colorWithRed:128 / 255.0 green:128 / 255.0 blue:128 / 255.0 alpha:1.0];
+            lineView.backgroundColor = RGBACOLORWithAlpha(128, 128, 128, 0.5);
             [self.labelView addSubview:lineView];
             [self.lineArray addObject:lineView];
         }
@@ -107,6 +110,7 @@
     if (_buttonView == nil) {
         _buttonView = [[KDButtonView alloc] init];
         _buttonView.backgroundColor = ClearColor;
+        _buttonView.buttonViewDelegate = self;
     }
     return _buttonView;
 }
@@ -125,11 +129,22 @@
     if (_contentView == nil) {
         _contentView = [[UIImageView alloc] init];
         _contentView.userInteractionEnabled = YES;
-        _contentView.layer.cornerRadius = 3.0f;
+        _contentView.layer.cornerRadius = 5.0f;
         _contentView.layer.masksToBounds = YES;
         _contentView.backgroundColor = WhiteColor;
     }
     return _contentView;
+}
+
+- (UIWindow *)showWindow
+{
+    if (!_showWindow) {
+        _showWindow = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+        _showWindow.hidden = NO;
+        _showWindow.windowLevel = UIWindowLevelAlert;
+        _showWindow.backgroundColor = ClearColor;
+    }
+    return _showWindow;
 }
 
 #pragma mark 设置各控件的属性
@@ -205,67 +220,13 @@
     [self.buttonArray addObject:actionButton];
 }
 
-
-- (void)showInView:(UIView *)view
-{
-    UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
-    [keyWindow addSubview:self];
-    self.frame = keyWindow.bounds;
-    self.coverBtn.frame = self.bounds;
-    
-    CGFloat contentX = GAP;
-    CGFloat contentY = self.height;
-    CGFloat contentW = self.width - GAP * 2;
-    CGFloat contentH = 0;
-    
-    CGFloat labelX = 0;
-    CGFloat labelY = 0;
-    CGFloat labelW = contentW;
-    CGFloat labelH = 0;
-    if (self.titleLable != nil) {
-        labelH = HEIGHT;
-        self.titleLable.frame = CGRectMake(0, 0, contentW, HEIGHT);
-    }
-    
-    if (self.messageLabel != nil) {
-        CGSize messageSize = [self sizeWithFont:self.messageLabel.font text:self.messageLabel.text maxSize:CGSizeMake(contentW - 6 * GAP, MAXFLOAT)];
-        self.messageLabel.frame = CGRectMake(3 * GAP, CGRectGetMaxY(self.titleLable.frame), contentW - 6 * GAP, messageSize.height + GAP);
-        labelH = labelH + self.messageLabel.height + GAP;
-    }
-    
-
-    self.labelView.frame = CGRectMake(labelX, labelY, labelW, labelH);
-    
-    self.buttonView.buttonArray = self.buttonArray;
-    self.buttonView.buttonHeight = HEIGHT;
-    
-    contentH = self.labelView.height + self.buttonView.height;
-    
-    self.contentView.top = contentY;
-    self.contentView.left = contentX;
-    self.contentView.height = contentH;
-    self.contentView.width = contentW;
-    
-    [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
-        
-        self.contentView.top = self.height - contentH - 2 * GAP;
-        
-    } completion:nil];
-
-}
-
-
 - (void)show
 {
-    UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
-    [keyWindow addSubview:self];
-    self.frame = keyWindow.bounds;
+    [[self showWindow] addSubview:self];
+    self.frame = [self showWindow].bounds;
     self.coverBtn.frame = self.bounds;
     
-    
-    CGFloat contentCenterX = 0;
-    CGFloat contentCenterY = 0;
-    CGFloat contentW = self.width - GAP * 2;
+    CGFloat contentW = self.width - GAP * 4;
     CGFloat contentH = 0;
     
     
@@ -280,8 +241,8 @@
     }
     
     if (self.messageLabel != nil) {
-        CGSize messageSize = [self sizeWithFont:self.messageLabel.font text:self.messageLabel.text maxSize:CGSizeMake(contentW - 6 * GAP, MAXFLOAT)];
-        self.messageLabel.frame = CGRectMake(3 * GAP, CGRectGetMaxY(self.titleLable.frame), contentW - 6 * GAP, messageSize.height + GAP);
+        CGSize messageSize = [self sizeWithFont:self.messageLabel.font text:self.messageLabel.text maxSize:CGSizeMake(contentW - 4 * GAP, MAXFLOAT)];
+        self.messageLabel.frame = CGRectMake(2 * GAP, CGRectGetMaxY(self.titleLable.frame), contentW - 4 * GAP, messageSize.height + GAP);
         labelH = labelH + self.messageLabel.height + GAP;
     }
     
@@ -298,19 +259,27 @@
     
     self.buttonView.buttonArray = self.buttonArray;
     self.buttonView.buttonHeight = HEIGHT;
+    self.buttonView.top = labelH;
+    self.buttonView.left = 0;
+    self.buttonView.width = contentW;
+    self.buttonView.height = self.buttonArray.count == 2 ? HEIGHT : self.buttonArray.count * HEIGHT;
+
     
     contentH = self.labelView.height + self.buttonView.height;
-    contentCenterX = self.centerX;
-    contentCenterY = self.centerY;
     
-    self.contentView.centerX = contentCenterX;
-    self.contentView.centerY = contentCenterY;
+    self.contentView.size = CGSizeMake(contentW, contentH);
+    //设置中心点之前必须设置size否则中心点会和预想的不一致
+    self.contentView.centerX = self.centerX;
+    self.contentView.centerY = self.centerY;
     
-    [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
-        
-        self.contentView.size = CGSizeMake(contentW, contentH);
-        
-    } completion:nil];
+    CABasicAnimation *anim = [CABasicAnimation animationWithKeyPath:@"transform.scale"] ;
+    anim.fromValue = @(0);
+    anim.toValue = @(1.0f);
+    anim.duration = ZB_animationDuration;
+    anim.repeatCount = NO;
+    anim.removedOnCompletion = YES;
+    [self.layer addAnimation:anim forKey:nil];
+    
 }
 - (void)buttonDidClick
 {
@@ -319,9 +288,24 @@
 
 - (void)dismissKdActionSheet
 {
-    [self removeFromSuperview];
+    CABasicAnimation *anim = [CABasicAnimation animationWithKeyPath:@"transform.scale"] ;
+    anim.fromValue = @(1.0f);
+    anim.toValue = @(0);
+    anim.duration = ZB_animationDuration;
+    anim.repeatCount = NO;
+    anim.removedOnCompletion = YES;
+    anim.delegate = self;
+    [self.layer addAnimation:anim forKey:nil];
+    
 }
 
+- (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag
+{
+    if (flag) {
+        [self removeFromSuperview];
+        _showWindow = nil;
+    }
+}
 - (CGSize)sizeWithFont:(UIFont *)font text:(NSString *)text maxSize:(CGSize)size
 {
     return [text boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName: font} context:nil].size;

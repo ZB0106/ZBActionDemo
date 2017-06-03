@@ -17,6 +17,21 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+//    KDActionSheet *sheet = [[KDActionSheet alloc] initWithTitle:@"dfaa" message:@"ceshi"];
+//    KDActionButton *button1 = [KDActionButton kdActionButtonWithButtonType:ZB_buttonOK title:@"ok" action:^(KDActionButton *button) {
+//        NSLog(@"11111");
+//    }];
+//    KDActionButton *button2 = [KDActionButton kdActionButtonWithButtonType:ZB_buttonOK title:@"ok" action:^(KDActionButton *button) {
+//        NSLog(@"2222");
+//    }];
+//    KDActionButton *button3 = [KDActionButton kdActionButtonWithButtonType:ZB_buttonOK title:@"ok" action:^(KDActionButton *button) {
+//        NSLog(@"3333");
+//    }];
+//    
+//    [sheet addActionButtonArray:@[button1]];
+//    [sheet show];
+
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
@@ -32,7 +47,7 @@
         NSLog(@"3333");
     }];
     
-    [sheet addActionButtonArray:@[button1]];
+    [sheet addActionButtonArray:@[button1,button2,button3]];
     [sheet show];
 
 }

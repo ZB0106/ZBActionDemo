@@ -29,7 +29,6 @@
 
 - (instancetype)initWithTitle:(NSString *)title message:(NSString *)message;
 - (void)show;
-- (void)showInView:(UIView *)view;
 - (void)addActionButtonArray:(NSArray *)actionButtonArray;
 - (void)addActionButton:(id)actionButton;
 @end
