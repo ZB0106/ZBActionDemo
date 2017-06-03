@@ -62,7 +62,7 @@ UIWindow *_showWindow;
         
         if (message != nil) {
         
-            self.messageLabel = [self labelWithTitle:message font:SystemFontOfSize(16.0f)];
+            self.messageLabel = [self labelWithTitle:message font:Font14];
             [self.labelView addSubview:self.messageLabel];
         
         }
@@ -272,14 +272,28 @@ UIWindow *_showWindow;
     self.contentView.centerX = self.centerX;
     self.contentView.centerY = self.centerY;
     
-    CABasicAnimation *anim = [CABasicAnimation animationWithKeyPath:@"transform.scale"] ;
-    anim.fromValue = @(0);
-    anim.toValue = @(1.0f);
-    anim.duration = ZB_animationDuration;
-    anim.repeatCount = NO;
-    anim.removedOnCompletion = YES;
-    [self.layer addAnimation:anim forKey:nil];
-    
+    [self animationWithValues:@[
+                               [NSValue valueWithCATransform3D:CATransform3DMakeScale(0.01f, 0.01f, 1.0f)],
+                               [NSValue valueWithCATransform3D:CATransform3DMakeScale(1.0f, 1.0f, 1.0f)]
+                               ] keytimes:@[@1.0f] delegate:nil];
+}
+
+- (void)animationWithValues:(NSArray *)values keytimes:(NSArray *)keyTimes delegate:(id)delegate
+{
+    CAKeyframeAnimation *popAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform"];
+    popAnimation.duration = ZB_animationDuration;
+    popAnimation.repeatCount = NO;
+    popAnimation.removedOnCompletion = YES;
+    if (delegate) {
+        popAnimation.delegate = self;
+    }
+    popAnimation.values = values;
+    popAnimation.keyTimes = keyTimes;
+    popAnimation.timingFunctions = @[[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut],
+                                     [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut],
+                                     [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
+    [self.layer addAnimation:popAnimation forKey:nil];
+
 }
 - (void)buttonDidClick
 {
@@ -288,17 +302,14 @@ UIWindow *_showWindow;
 
 - (void)dismissKdActionSheet
 {
-    CABasicAnimation *anim = [CABasicAnimation animationWithKeyPath:@"transform.scale"] ;
-    anim.fromValue = @(1.0f);
-    anim.toValue = @(0);
-    anim.duration = ZB_animationDuration;
-    anim.repeatCount = NO;
-    anim.removedOnCompletion = YES;
-    anim.delegate = self;
-    [self.layer addAnimation:anim forKey:nil];
-    
+    [self animationWithValues:@[
+                               [NSValue valueWithCATransform3D:CATransform3DMakeScale(1.0f, 1.0f, 1.0f)],
+                               [NSValue valueWithCATransform3D:CATransform3DMakeScale(0.01f, 0.01f, 1.0f)]
+                               ] keytimes:@[@1.0f] delegate:self];
 }
 
+
+#pragma mark 动画代理
 - (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag
 {
     if (flag) {

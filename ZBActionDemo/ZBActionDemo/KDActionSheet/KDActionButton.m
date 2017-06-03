@@ -57,19 +57,19 @@
         case ZB_buttonOK:
         {
             item.titleColor = BlueColor;
-            item.titleFont = Font14;
+            item.titleFont = Font16;
         }
             break;
         case ZB_buttonCancel:
         {
             item.titleColor = BlackColor;
-            item.titleFont = Font14;
+            item.titleFont = Font16;
         }
             break;
         case ZB_buttonDestroy:
         {
             item.titleColor = RedColor;
-            item.titleFont = Font14;
+            item.titleFont = Font16;
         }
             break;
 
