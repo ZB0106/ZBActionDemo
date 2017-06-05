@@ -27,7 +27,9 @@ typedef enum NSInteger {
 @interface KDActionButton : UIButton
 
 typedef void(^buttonAction)(KDActionButton *button);
+typedef ZB_ButtonItem *(^createItem)();
 
 @property (nonatomic, copy) buttonAction action;
 + (instancetype)kdActionButtonWithButtonType:(ZB_buttonType)buttonType title:(NSString *)title action:(buttonAction)action;
++ (instancetype)kdActionButtonWithCustomButtonItem:(createItem)buttonItem title:(NSString *)title action:(buttonAction)action;
 @end
