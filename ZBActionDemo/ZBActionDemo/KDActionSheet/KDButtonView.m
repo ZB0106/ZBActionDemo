@@ -42,7 +42,7 @@
         
         if (i != buttonCount - 1) {
             UIView *lineView = [[UIView alloc] init];
-            lineView.backgroundColor = RGBACOLORWithAlpha(128, 128, 128, 0.5);
+            lineView.backgroundColor = RGBACOLORWithAlpha(128, 128, 128, 0.2);
             [self addSubview:lineView];
             [self.lineArray addObject:lineView];
         }
